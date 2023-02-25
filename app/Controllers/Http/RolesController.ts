@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Role from '../../Models/Role';
 import CreateRoleValidator from '../../Validators/CreateRoleValidator';
+import { v4 as uuid } from 'uuid';
 
 export default class RolesController {
   public async index({response}: HttpContextContract) {
@@ -10,11 +11,14 @@ export default class RolesController {
   public async store({request,response}: HttpContextContract) {
     try {
       const payload = await request.validate(CreateRoleValidator)
+      const role_id = uuid()
       const role = await Role.create({
+        id: role_id,
         name: payload.name.toLowerCase(),
         guardName: payload.guardName
       })
       await role.save()
+      role.id = role_id
       return response.created(role)
     } catch (error) {
       return response.badRequest(error.messages)

@@ -27,10 +27,13 @@ export default class CreateRoleValidator {
     name: schema.string({},[
       rules.required(),
       rules.maxLength(100),
+      rules.minLength(1),
+      rules.unique({table:"roles", column:"name"}),
     ]),
     guardName: schema.string({},[
       rules.required(),
-      rules.maxLength(500)
+      rules.maxLength(500),
+      rules.minLength(1),
     ])
   })
 

@@ -2,10 +2,14 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm';
 import Role from './Role';
 import User from './User';
+import { v4 as uuid } from 'uuid';
 
 export default class Permission extends BaseModel {
-  @column({ isPrimary: true })
-  public id: number
+  @column({
+    isPrimary: true,
+    prepare: (value: string) => value ? value : uuid()
+  })
+  public id: string
 
   @column()
   public name: string
@@ -24,4 +28,5 @@ export default class Permission extends BaseModel {
 
   @manyToMany(()=> User)
   public users: ManyToMany<typeof User>
+
 }

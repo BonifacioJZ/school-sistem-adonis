@@ -27,10 +27,13 @@ export default class CreatePermissionValidator {
     name: schema.string({},[
       rules.required(),
       rules.maxLength(100),
+      rules.minLength(1),
+      rules.unique({table:"permissions",column:"name"})
     ]),
     guardName: schema.string({},[
       rules.required(),
-      rules.maxLength(500)
+      rules.maxLength(500),
+      rules.minLength(1)
     ])
   })
 

@@ -5,11 +5,11 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary()
+      table.uuid('id').index().primary().notNullable()
       table.string('name',200).notNullable()
       table.string('last_name',200).notNullable()
-      table.string('username',100).notNullable().unique()
-      table.string('password',32).notNullable()
+      table.string('user_name',100).notNullable().unique()
+      table.string('password').notNullable()
       table.string('email').notNullable().unique()
 
       /**

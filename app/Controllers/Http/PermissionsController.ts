@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Permission from '../../Models/Permission';
 import CreatePermissionValidator from '../../Validators/CreatePermissionValidator';
+import { v4 as uuid } from 'uuid';
 
 export default class PermissionsController {
   public async index({response}: HttpContextContract) {
@@ -10,11 +11,14 @@ export default class PermissionsController {
   public async store({response,request}: HttpContextContract) {
     try {
       const payload = await request.validate(CreatePermissionValidator)
+      const permissions_id =  uuid()
       const permission = await  Permission.create({
+        id: permissions_id,
         name: payload.name.toLowerCase(),
         guardName: payload.guardName,
       })
       await permission.save()
+      permission.id = permissions_id
       return response.created(permission)
     } catch (error) {
       return response.badRequest(error.messages)
