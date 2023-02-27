@@ -5,17 +5,18 @@ import { v4 as uuid } from 'uuid';
 
 export default class extends BaseSeeder {
   public async run () {
+    const role_id = uuid()
     await Role.create({
-      id:uuid(),
+      id:role_id,
       name: "superuser",
       guardName:"Super User"
     })
-
-    await Permission.create({
-      id: uuid(),
+    const permission_id = uuid()
+    const permission =await Permission.create({
+      id: permission_id,
       name: "all.permissions",
       guardName:"All Permissions"
     })
-
+    await permission.related('roles').attach([role_id])
   }
 }

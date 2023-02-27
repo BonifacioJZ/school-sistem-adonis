@@ -18,10 +18,11 @@ export default class PermissionsController {
         guardName: payload.guardName,
       })
       await permission.save()
+      if(!permission.$isPersisted) return response.badRequest("Error to create permission")
       permission.id = permissions_id
       return response.created(permission)
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
   }
 
@@ -39,9 +40,10 @@ export default class PermissionsController {
       payload.name = payload.name.toLowerCase()
       permissions.merge(payload)
       await permissions.save()
+      if(!permissions.$isPersisted) return response.badRequest("error to update permissions")
       return response.status(200).send(permissions)
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
   }
 
@@ -49,9 +51,10 @@ export default class PermissionsController {
     try {
       const permission = await Permission.findOrFail(request.param('id'))
       await permission.delete()
+      if (!permission.$isDeleted) return response.badRequest("Error to delete permission")
       return response.status(200).send("Deleted")
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
 
   }

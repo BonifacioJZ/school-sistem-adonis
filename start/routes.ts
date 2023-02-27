@@ -30,17 +30,25 @@ Route.group(()=>{
     Route.get('/:id', 'RolesController.show')
     Route.put('/:id', 'RolesController.update')
     Route.delete('/:id','RolesController.destroy')
-  }).prefix('/role')
+  }).prefix('/role').middleware('auth')
   Route.group(()=>{
     Route.get('/','PermissionsController.index')
     Route.post('/','PermissionsController.store')
     Route.get('/:id','PermissionsController.show')
     Route.put('/:id','PermissionsController.update')
     Route.delete('/:id','PermissionsController.destroy')
-  }).prefix('/permissions')
+  }).prefix('/permissions').middleware('auth')
+  Route.group(()=>{
+    Route.post('/','RolesAddPermissionsController.add')
+  }).prefix('/role-add-permissions')
+
   Route.group(()=>{
     Route.get('/', 'UsersController.index')
     Route.post('/', 'UsersController.store')
     Route.get('/:id', 'UsersController.show')
-  }).prefix('/users')
+    Route.put('/:id', 'UsersController.update')
+    Route.delete('/:id','UsersController.destroy')
+    Route.post('/add-rol','UsersController.addRol');
+  }).prefix('/users').middleware('auth')
+  Route.post('/login','AuthController.login')
 }).prefix('/api/v1')

@@ -18,10 +18,11 @@ export default class RolesController {
         guardName: payload.guardName
       })
       await role.save()
+      if(!role.$isPersisted) return response.badRequest("Error to create role ")
       role.id = role_id
       return response.created(role)
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
   }
   public async show({response,request}:HttpContextContract){
@@ -39,9 +40,10 @@ export default class RolesController {
       payload.name = payload.name.toLowerCase()
       role.merge(payload)
       await role.save()
+      if(!role.$isPersisted) return response.badRequest("Error to update role")
       return response.status(200).send(role)
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
   }
 
@@ -49,9 +51,10 @@ export default class RolesController {
     try {
       const role = await Role.findOrFail(request.param('id'))
       await role.delete()
+      if(!role.$isDeleted) return response.badRequest("Error to delete role")
       return response.status(200).send("Deleted")
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
 
   }

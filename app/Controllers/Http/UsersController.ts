@@ -2,7 +2,9 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from '../../Models/User';
 import CreateUserValidator from '../../Validators/CreateUserValidator';
 import { v4 as uuid } from 'uuid';
-import Hash from '@ioc:Adonis/Core/Hash'
+import UpdateUserValidator from '../../Validators/UpdateUserValidator';
+import UserAndRolValidator from '../../Validators/UserAndRolValidator';
+import Role from '../../Models/Role';
 
 export default class UsersController {
   public async index({response}: HttpContextContract) {
@@ -23,25 +25,60 @@ export default class UsersController {
         password:payload.password
       });
       await user.save()
+      if(!user.$isPersisted) return response.badRequest("Error to Create User")
       user.id = user_id
       return response.created(user)
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
   }
 
   public async show({request,response}: HttpContextContract) {
     try {
-      const user = await User.find(request.param('id'))
-      if(!user) return response.badRequest("Not found")
+      const user = await User.findOrFail(request.param('id'))
+      await user.load('permissions')
+      await user.load('roles')
       return response.status(200).send(user)
     } catch (error) {
-      return response.badRequest(error.messages)
+      return response.badRequest(error)
     }
 
   }
 
-  //public async update({}: HttpContextContract) {}
+  public async update({request,response}: HttpContextContract) {
+    try {
+      const user = await User.findOrFail(request.param('id'))
+      const payload = await request.validate(UpdateUserValidator)
+      user.merge(payload)
+      await user.save()
+      if(!user.$isPersisted) return response.badRequest("Error to update user")
+      return response.status(200).send({"user":user})
+    } catch (error) {
+      return response.badRequest(error)
+    }
+  }
 
-  //public async destroy({}: HttpContextContract) {}
+  public async destroy({request,response}: HttpContextContract) {
+    try {
+      const user = await User.findOrFail(request.param('id'))
+      await user.delete()
+      if(!user.$isDeleted) return response.badRequest("Error to delete user")
+      return response.status(200).send("Deleted")
+    } catch (error) {
+      return response.badRequest(error)
+    }
+  }
+  public async addRol({request,response,auth}:HttpContextContract){
+
+    try {
+      const payload = await request.validate(UserAndRolValidator)
+      const user = await User.findOrFail(payload.user_id)
+      const role = await Role.findOrFail(payload.role_id)
+      await user.related('roles').attach([role.id])
+      await user.load('roles')
+      return response.status(200).send({"user":user})
+    } catch (error) {
+      return response.badRequest(error)
+    }
+  }
 }
