@@ -2,11 +2,14 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Permission from '../../Models/Permission';
 import CreatePermissionValidator from '../../Validators/CreatePermissionValidator';
 import { v4 as uuid } from 'uuid';
+import Redis from '@ioc:Adonis/Addons/Redis';
 
 export default class PermissionsController {
   public async index({response}: HttpContextContract) {
-    const permissions = await Permission.all()
-    return response.status(200).send(permissions)
+    await Redis.set('permissions',JSON.stringify(await Permission.all()))
+    const permissions = await Redis.get('permissions')
+    if(!permissions) return response.badRequest("error to cashed")
+    return response.status(200).send(JSON.parse(permissions))
   }
   public async store({response,request}: HttpContextContract) {
     try {

@@ -5,6 +5,8 @@ import { v4 as uuid } from 'uuid';
 import UpdateUserValidator from '../../Validators/UpdateUserValidator';
 import UserAndRolValidator from '../../Validators/UserAndRolValidator';
 import Role from '../../Models/Role';
+import UserAndPermissionValidator from '../../Validators/UserAndPermissionValidator';
+import Permission from '../../Models/Permission';
 
 export default class UsersController {
   public async index({response}: HttpContextContract) {
@@ -68,7 +70,7 @@ export default class UsersController {
       return response.badRequest(error)
     }
   }
-  public async addRol({request,response,auth}:HttpContextContract){
+  public async addRol({request,response}:HttpContextContract){
 
     try {
       const payload = await request.validate(UserAndRolValidator)
@@ -76,6 +78,18 @@ export default class UsersController {
       const role = await Role.findOrFail(payload.role_id)
       await user.related('roles').attach([role.id])
       await user.load('roles')
+      return response.status(200).send({"user":user})
+    } catch (error) {
+      return response.badRequest(error)
+    }
+  }
+  public async addPermission({request,response}:HttpContextContract){
+    try {
+      const payload = await request.validate(UserAndPermissionValidator)
+      const user = await User.findOrFail(payload.user_id)
+      const permission = await Permission.findOrFail(payload.permission_id)
+      await user.related('permissions').attach([permission.id])
+      await user.load('permissions')
       return response.status(200).send({"user":user})
     } catch (error) {
       return response.badRequest(error)

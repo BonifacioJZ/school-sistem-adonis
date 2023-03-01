@@ -49,6 +49,12 @@ Route.group(()=>{
     Route.put('/:id', 'UsersController.update')
     Route.delete('/:id','UsersController.destroy')
     Route.post('/add-rol','UsersController.addRol');
+    Route.post('/add-permission','UsersController.addPermission');
   }).prefix('/users').middleware('auth')
   Route.post('/login','AuthController.login')
+  Route.group(()=>{
+    Route.get('/','StudentsController.index')
+    Route.post('/','StudentsController.store')
+    Route.get('/:code','StudentsController.show')
+  }).prefix('/students')
 }).prefix('/api/v1')

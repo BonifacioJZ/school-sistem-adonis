@@ -1,8 +1,10 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeSave, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, beforeSave, column,  HasOne, hasOne, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm';
 import Hash from '@ioc:Adonis/Core/Hash'
 import Role from './Role';
 import Permission from './Permission';
+import Teacher from './Teacher';
+import Student from './Student';
 import {v4 as uuid }from 'uuid'
 
 export default class User extends BaseModel {
@@ -40,11 +42,17 @@ export default class User extends BaseModel {
     }
   }
 
-
   @manyToMany(()=> Role)
   public roles: ManyToMany<typeof Role>
 
   @manyToMany(()=> Permission)
   public permissions: ManyToMany<typeof Permission>
+
+  @hasOne(()=>Teacher)
+  public teachers:HasOne<typeof Teacher>
+
+  @hasOne(()=>Student)
+  public students:HasOne<typeof Student>
+
 
 }
