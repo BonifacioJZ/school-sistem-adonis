@@ -7,11 +7,15 @@ import UserAndRolValidator from '../../Validators/UserAndRolValidator';
 import Role from '../../Models/Role';
 import UserAndPermissionValidator from '../../Validators/UserAndPermissionValidator';
 import Permission from '../../Models/Permission';
+import Redis from '@ioc:Adonis/Addons/Redis';
 
 export default class UsersController {
   public async index({response}: HttpContextContract) {
     const users = await User.all();
-    return response.status(200).send(users)
+    await Redis.set('users',JSON.stringify(users));
+    const jsonUsers = await Redis.get('users');
+    if(!jsonUsers) return response.badRequest("Error to cache")
+    return response.status(200).send({"users":JSON.parse(jsonUsers)})
   }
 
   public async store({response,request}: HttpContextContract) {
@@ -40,7 +44,10 @@ export default class UsersController {
       const user = await User.findOrFail(request.param('id'))
       await user.load('permissions')
       await user.load('roles')
-      return response.status(200).send(user)
+      await Redis.set(request.param('id'),JSON.stringify(user));
+      const jsonUser = await Redis.get(request.param('id'));
+      if(!jsonUser) return response.badRequest("Error to cache")
+      return response.status(200).send({"user":JSON.parse(jsonUser)})
     } catch (error) {
       return response.badRequest(error)
     }

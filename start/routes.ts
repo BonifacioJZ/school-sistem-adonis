@@ -56,5 +56,7 @@ Route.group(()=>{
     Route.get('/','StudentsController.index')
     Route.post('/','StudentsController.store')
     Route.get('/:code','StudentsController.show')
+    Route.put('/:code','StudentsController.update')
+    Route.delete('/:code','StudentsController.destroy')
   }).prefix('/students')
 }).prefix('/api/v1')
